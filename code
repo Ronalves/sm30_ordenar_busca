@@ -1,0 +1,76 @@
+*&---------------------------------------------------------------------*
+*&      Module  SORT_EXTRACT  OUTPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE sort_extract OUTPUT.
+*
+*  TYPES:BEGIN OF ty_913,
+*        tp_indice TYPE ztp_indice,
+*        dt_indice  TYPE zdt_indice,
+*        mes(2) TYPE c,
+*        ano(4) TYPE c,
+*    END OF ty_913.
+*
+*  DATA:lt_tab_agent TYPE STANDARD TABLE OF ztbfi913,
+*       lt_tab_sort  TYPE STANDARD TABLE OF ztbfi913,
+*       ls_tab_agent TYPE ztbfi913,
+*       lt_913       TYPE TABLE OF ty_913,
+*       ls_913       TYPE ty_913.
+*
+*  FIELD-SYMBOLS: <lfs_xfrom> TYPE x, "Hexadecimal value of from value
+*                 <lfs_xto>   TYPE x, "Hexadecimal value of to value
+*                 <lfs_913>   TYPE ty_913.
+*
+*  IF NOT sy-ucomm = 'NEWL'
+*     AND NOT sy-ucomm = 'MKBL'
+*     AND NOT sy-ucomm = 'MKAL'
+*     AND NOT sy-ucomm = 'MKLO'
+*     AND NOT sy-ucomm = 'ORGI'
+*     AND NOT sy-ucomm = 'KOPE'
+*     AND NOT sy-ucomm = 'FURT'.
+*
+*    CLEAR: lt_tab_agent[],
+*           lt_913[],
+*           lt_tab_sort[].
+*
+*    LOOP AT extract.
+*
+*      APPEND INITIAL LINE TO lt_tab_agent ASSIGNING <lfs_xto> CASTING.
+*      ASSIGN extract TO <lfs_xfrom> CASTING.
+*
+*      <lfs_xto> = <lfs_xfrom>.
+*
+*    ENDLOOP.
+*
+*    LOOP AT lt_tab_agent INTO ls_tab_agent.
+*      APPEND INITIAL LINE TO lt_913 ASSIGNING <lfs_913>.
+*      <lfs_913>-tp_indice = ls_tab_agent-tp_indice.
+*      <lfs_913>-dt_indice = ls_tab_agent-dt_indice.
+*      SPLIT ls_tab_agent-dt_indice AT '.' INTO <lfs_913>-mes <lfs_913>-ano.
+*    ENDLOOP.
+*
+*    SORT lt_913 BY tp_indice ano mes.
+*
+*    LOOP AT lt_913  INTO ls_913.
+*      READ TABLE lt_tab_agent INTO ls_tab_agent WITH KEY tp_indice = ls_913-tp_indice
+*                                                         dt_indice = ls_913-dt_indice.
+*      IF sy-subrc = 0.
+*        APPEND ls_tab_agent TO lt_tab_sort.
+*      ENDIF.
+*    ENDLOOP.
+*
+*    REFRESH extract.
+*    LOOP AT lt_tab_sort INTO ztbfi913.
+*
+*      APPEND INITIAL LINE TO extract ASSIGNING <lfs_xto> CASTING.
+*      ASSIGN ztbfi913 TO <lfs_xfrom> CASTING.
+*
+*      <lfs_xto> = <lfs_xfrom>.
+*
+*    ENDLOOP.
+*
+*
+*  ENDIF.
+
+ENDMODULE.                 " SORT_EXTRACT  OUTPUT
